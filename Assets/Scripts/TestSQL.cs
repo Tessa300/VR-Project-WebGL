@@ -18,6 +18,7 @@ public class TestSQL : MonoBehaviour
     {
         WebRequest request = WebRequest.Create(url + "&get=NewSession");
         request.Method = "GET";
+        request.Timeout = 10000;
         WebResponse webResponse = request.GetResponse();
         sessionID = new StreamReader(webResponse.GetResponseStream()).ReadToEnd();
         Debug.Log("SessionID: " + sessionID);
@@ -27,45 +28,56 @@ public class TestSQL : MonoBehaviour
     void Update()
     {
         //counter++;
-        if (updated ) //|| counter % 1 != 0)
+        if (updated) //|| counter % 1 != 0)
             return;
         //updated = true;
-        Debug.Log("Enter Update");
         String reqUrl = "";
         try
         {
-            sessionID = "290845";
+            sessionID = "222222";
             WebRequest request = WebRequest.Create(url + "&get=ControllerData&SessionID=" + sessionID);
             request.Method = "GET";
-            request.Timeout = 1000; 
+            request.Timeout = 800;
             reqUrl = request.RequestUri.AbsolutePath;
 
             WebResponse webResponse = request.GetResponse();
             String json = new StreamReader(webResponse.GetResponseStream()).ReadToEnd();
 
+            Debug.Log("JSON: " + json);
+
             if (!json.StartsWith("{"))
                 return;
 
-            double orientation_x = 0;
-            double orientation_y = 0;
-            double orientation_z = 0;
+            float x = 0;
+            float y = 0;
+            float z = 0;
             foreach (string row in json.Substring(1, json.Length - 2).Split(','))
             {
-                if (row.Contains("_X"))
-                    orientation_x = Double.Parse(row.Substring(17, row.Length - 18).Replace('.', ','));
-                if (row.Contains("_Y"))
-                    orientation_y = Double.Parse(row.Substring(17, row.Length - 18).Replace('.', ','));
-                if (row.Contains("_Z"))
-                    orientation_z = Double.Parse(row.Substring(17, row.Length - 18).Replace('.', ','));
+                if (row.Contains("X"))
+                    x = float.Parse(row.Substring(5, row.Length - 6).Replace('.', ','));
+                if (row.Contains("Y"))
+                    y = float.Parse(row.Substring(5, row.Length - 6).Replace('.', ','));
+                if (row.Contains("Z"))
+                    z = float.Parse(row.Substring(5, row.Length - 6).Replace('.', ','));
             }
-            Debug.Log("x: " + orientation_x + " | y: " + orientation_y + " | z: " + orientation_z);
-            transform.Translate(1,0,0);
+            Debug.Log("x: " + x + " | y: " + y + " | z: " + z);
+            // x: rechts/links
+
             updated = false;
+            move(x, y, z);
         }
         catch (Exception e)
         {
-            Debug.Log("Fehler bei URL: " + reqUrl + Environment.NewLine + e.Message);
+            Debug.Log("Fehler bei URL: " + reqUrl + Environment.NewLine + e.Message + Environment.NewLine + e.StackTrace);
         }
-        Debug.Log("Exit Update");
+    }
+
+    private void move(float x, float y, float z)
+    {
+        float interval = 0.3f;
+        x = x - (x % interval);
+
+        Vector3 dir = (new Vector3(x, 0, 0)).normalized;
+        transform.Translate(dir);
     }
 }

@@ -5,3 +5,5 @@ Temp
 UserSettings
 .vsconfig
 VR-Project-WebGL.sln
+*.suo
+Assembly-CSharp.csproj
