@@ -29,7 +29,6 @@ public class AcceleratorCable : MonoBehaviour
         
         // Get the delta direction
         Vector3 yaw = Input.acceleration.x * transform.right * rotateSpeedX * Time.deltaTime;
-        Debug.Log(Input.acceleration.x);
         Vector3 pitch = Input.acceleration.z * transform.up * rotateSpeedY * Time.deltaTime;
         Vector3 dir = yaw + pitch;
 
