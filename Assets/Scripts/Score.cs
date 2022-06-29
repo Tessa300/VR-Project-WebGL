@@ -8,7 +8,7 @@ public class Score : MonoBehaviour
 {
     public TextMeshProUGUI scoreText;
     int score;
-    bool isUsed = false;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -21,14 +21,14 @@ public class Score : MonoBehaviour
         scoreText.text = score.ToString();
     }
 
-    private void OnTriggerExit(Collider collider) {
-        if(collider.tag == "ring" && !isUsed) {
-            isUsed = true;
+    private void OnTriggerEnter(Collider collider) {
+        if(collider.tag == "ring") {
             score++;
             Destroy(collider.gameObject);
         }
         if(collider.tag == "enemy") {
             score--;
         }
+        Debug.Log(collider.tag);
     }
 }
