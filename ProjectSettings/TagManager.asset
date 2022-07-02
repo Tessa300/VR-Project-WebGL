@@ -6,6 +6,8 @@ TagManager:
   tags:
   - ring
   - enemy
+  - Enemy
+  - asteroid
   layers:
   - Default
   - TransparentFX

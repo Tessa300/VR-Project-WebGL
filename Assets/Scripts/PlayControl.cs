@@ -85,6 +85,10 @@ public class PlayControl : MonoBehaviour
             // Stop game
             StartCoroutine(E_stopSequence(crashPlanetSound, "Von Planet gefressen"));
         }
+        if(collider.tag == "asteroid") {
+            score--;
+            Destroy(collider.gameObject);
+        }
         PlayerPrefs.SetInt("gameScore", score);
         Debug.Log(collider.tag);
     }
