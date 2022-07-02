@@ -3,9 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class MenuStartBtn : MonoBehaviour
 {
+    public TextMeshPro textGameScore;
+    public TextMeshPro textHighscore1;
+    public TextMeshPro textHighscore2;
+    public TextMeshPro textHighscore3;
+
+
     // Start is called before the first frame update
     void Start()
     {
@@ -15,51 +22,54 @@ public class MenuStartBtn : MonoBehaviour
             PlayerPrefs.SetInt("highscore_1", 0);
             PlayerPrefs.SetInt("highscore_2", 0);
             PlayerPrefs.SetInt("highscore_3", 0);
+            PlayerPrefs.SetInt("gameScore", 0);
             PlayerPrefs.Save();
         }
 
+        int highscore1 = PlayerPrefs.GetInt("highscore_1");
+        int highscore2 = PlayerPrefs.GetInt("highscore_2");
+        int highscore3 = PlayerPrefs.GetInt("highscore_3");
+        int gameScore = PlayerPrefs.GetInt("gameScore");
+
         // Check if new score is a highscore and set score to text object
-        if (PlayerPrefs.HasKey("gameScore"))
+        if (gameScore != 0 && gameScore >= highscore3)
         {
-            GameObject.Find("Score").SetActive(true);
-            if (PlayerPrefs.GetInt("gameScore") >= PlayerPrefs.GetInt("highscore_1"))
+
+            if (gameScore >= highscore1)
             {
-                PlayerPrefs.SetInt("highscore_3", PlayerPrefs.GetInt("highscore_2"));
-                PlayerPrefs.SetInt("highscore_2", PlayerPrefs.GetInt("highscore_1"));
-                PlayerPrefs.SetInt("highscore_1", PlayerPrefs.GetInt("gameScore"));
-                PlayerPrefs.Save();
-                GameObject.Find("Score").GetComponent<UnityEngine.UI.Text>().text = "New first place: ";
+                highscore3 = highscore2;
+                highscore2 = highscore1;
+                highscore1 = gameScore;
+                textGameScore.text = "Neuer erster Platz: ";
             }
-            else if (PlayerPrefs.GetInt("gameScore") >= PlayerPrefs.GetInt("highscore_2"))
+            else if (gameScore >= highscore2)
             {
-                PlayerPrefs.SetInt("highscore_3", PlayerPrefs.GetInt("highscore_2"));
-                PlayerPrefs.SetInt("highscore_2", PlayerPrefs.GetInt("gameScore"));
-                PlayerPrefs.Save();
-                GameObject.Find("Score").GetComponent<UnityEngine.UI.Text>().text = "New second place: ";
+                highscore3 = highscore2;
+                highscore2 = gameScore;
+                textGameScore.text = "Neuer zweiter Platz: ";
             }
-            else if (PlayerPrefs.GetInt("gameScore") > PlayerPrefs.GetInt("highscore_3"))
+            else // (gameScore >= highscore3)
             {
-                PlayerPrefs.SetInt("highscore_3", PlayerPrefs.GetInt("gameScore"));
-                PlayerPrefs.Save();
-                GameObject.Find("Score").GetComponent<UnityEngine.UI.Text>().text = "New third place: ";
-            }
-            else
-            {
-                GameObject.Find("Score").GetComponent<UnityEngine.UI.Text>().text = "No new record: ";
+                highscore3 = gameScore;
+                textGameScore.text = "Neuer dritter Platz: ";
             }
 
-            GameObject.Find("Score").GetComponent<UnityEngine.UI.Text>().text += PlayerPrefs.GetInt("gameScore").ToString();
+            PlayerPrefs.SetInt("highscore_1", highscore1);
+            PlayerPrefs.SetInt("highscore_2", highscore2);
+            PlayerPrefs.SetInt("highscore_3", highscore3);
+            PlayerPrefs.Save();
+
+            textGameScore.text += gameScore.ToString();
         }
         else
         {
-            GameObject.Find("Score").SetActive(false);
+            textGameScore.text = "Kein neuer Rekord " + gameScore.ToString();
         }
 
         // Set highscore texts
-        GameObject.Find("Podium_1/Score").GetComponent<TMPro.TextMeshPro>().text = PlayerPrefs.GetInt("highscore_1").ToString();
-        GameObject.Find("Podium_2/Score").GetComponent<TMPro.TextMeshPro>().text = PlayerPrefs.GetInt("highscore_2").ToString();
-        GameObject.Find("Podium_3/Score").GetComponent<TMPro.TextMeshPro>().text = PlayerPrefs.GetInt("highscore_3").ToString();
-
+        textHighscore1.text = highscore1.ToString();
+        textHighscore2.text = highscore2.ToString();
+        textHighscore3.text = highscore3.ToString();
     }
 
    
