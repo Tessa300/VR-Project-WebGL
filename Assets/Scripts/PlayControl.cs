@@ -21,14 +21,15 @@ public class PlayControl : MonoBehaviour
     public AudioSource winnerSound;
 
     private float energy = 100f;
-    private float secondsBetweenDecreases = 1f;
-    private float decreasePercentage = 0.03f;
-    private float increasePercentage = 0.3f;
+    private float secondsBetweenEnergyDecreases = 1f;
+    private float decreaseEnergyPercentage = 0.03f;
+    private float increaseEnergyPercentage = 0.3f;
     private float lowEnergyWarnStart = 50f;
-    private float lastDecrease = 0;
+    private float lastEnergyDecrease = 0;
     private float ringIncreaseSpeedPercentage = 1f;
 
     private bool musicFadeOutEnabled = false;
+    private bool outOfControl = false;
     private bool running = false;
     private int score = 0;
 
@@ -44,10 +45,10 @@ public class PlayControl : MonoBehaviour
         if (running)
         {
             // Decrease energy
-            if (Time.realtimeSinceStartup - lastDecrease >= secondsBetweenDecreases)
+            if (Time.realtimeSinceStartup - lastEnergyDecrease >= secondsBetweenEnergyDecreases)
             {
-                energy -= (energy * decreasePercentage > 2) ? energy * decreasePercentage : 2; // minimus decrease value is 2%
-                lastDecrease = Time.realtimeSinceStartup;
+                energy -= (energy * decreaseEnergyPercentage > 2) ? energy * decreaseEnergyPercentage : 2; // minimus decrease value is 2%
+                lastEnergyDecrease = Time.realtimeSinceStartup;
             }
 
             // End game if energy is empty
@@ -55,6 +56,7 @@ public class PlayControl : MonoBehaviour
             {
                 energy = 0;
                 GetComponent<Renderer>().material.color = Color.red;
+                outOfControl = true;
                 // Stop game
                 StartCoroutine(E_stopSequence(energyEmptySound, "Keine Energie mehr"));
             }
@@ -70,7 +72,7 @@ public class PlayControl : MonoBehaviour
                 GetComponent<Renderer>().material.color = Color.white;
             }
 
-            if (energy <= lowEnergyWarnStart)
+            if (energy <= lowEnergyWarnStart && energy > 0)
             {
                 // Energy low running -> Blink
                 GetComponent<Renderer>().material.color = Color.Lerp(Color.white, Color.red, Mathf.PingPong(Time.time, 1));
@@ -87,6 +89,10 @@ public class PlayControl : MonoBehaviour
             else
                 backgroundMusic.volume = newVolume;
         }
+
+        // Player is out of control -> turns
+        if (outOfControl)
+            transform.Rotate(UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360));
     }
 
     private void OnTriggerEnter(Collider collider)
@@ -100,8 +106,8 @@ public class PlayControl : MonoBehaviour
         if (collider.tag == "ring")
         {
             score++;
-            energy = (energy + energy * increasePercentage < 100) ? energy + energy * decreasePercentage : 100;
-            Destroy(collider.gameObject); // Destroy Ring
+            energy = (energy + energy * increaseEnergyPercentage < 100) ? energy + energy * decreaseEnergyPercentage : 100;
+            Destroy(collider.gameObject);
             StartCoroutine(E_playSoundShowText(ringCrossingSound, ringIncreaseSpeedPercentage));
         }
         else if (collider.tag == "planet")
@@ -124,11 +130,11 @@ public class PlayControl : MonoBehaviour
         AcceleratorCable ac = gameObject.GetComponent<AcceleratorCable>();
         playSource.Play();
         scoreText.text = "Score " + score.ToString() + "\n" + Math.Round(energy) + "%";
-        if (increasePercentage != 0)
-            ac.IncreaseSpeed(ringIncreaseSpeedPercentage);
+        if (increaseSpeedPercentage != 0)
+            ac.IncreaseSpeed(increaseSpeedPercentage);
         yield return new WaitForSeconds(playSource.clip.length);
-        if (increasePercentage != 0)
-            ac.DecreaseSpeed(ringIncreaseSpeedPercentage);
+        if (increaseSpeedPercentage != 0)
+            ac.DecreaseSpeed(increaseSpeedPercentage);
         scoreText.text = "";
     }
 
@@ -150,7 +156,7 @@ public class PlayControl : MonoBehaviour
         yield return new WaitForSeconds(0.5f);
         endText.text = "";
         ac.moveAllowed = true;
-        lastDecrease = Time.realtimeSinceStartup;
+        lastEnergyDecrease = Time.realtimeSinceStartup;
         running = true;
     }
 

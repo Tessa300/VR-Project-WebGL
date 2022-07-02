@@ -7,6 +7,8 @@ using TMPro;
 
 public class MenuStartBtn : MonoBehaviour
 {
+    public string gameSceneName;
+
     public TextMeshPro textGameScore;
     public TextMeshPro textHighscore1;
     public TextMeshPro textHighscore2;
@@ -94,7 +96,7 @@ public class MenuStartBtn : MonoBehaviour
         if (transform.position.x >= 207)
         {
             // start
-            SceneManager.LoadScene(sceneName: "SampleScene");
+            SceneManager.LoadScene(sceneName: gameSceneName);
         }
     }
 }
