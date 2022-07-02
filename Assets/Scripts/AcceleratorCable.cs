@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class AcceleratorCable : MonoBehaviour
 {
+    public bool moveAllowed = false;
     float speed = 100.0f;
     int counter = 0;
     private CharacterController controller;
-    private float baseSpeed = 40.0f;
+    private float baseSpeed = 20.0f; //40
     private float rotateSpeedX = 10.0f;
     private float rotateSpeedY = 1.5f;
 
@@ -20,7 +21,8 @@ public class AcceleratorCable : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (!moveAllowed)
+            return;
 
         // Give the player forward velocity
         Vector3 moveVector = transform.forward * baseSpeed;
