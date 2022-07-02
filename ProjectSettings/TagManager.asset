@@ -5,9 +5,9 @@ TagManager:
   serializedVersion: 2
   tags:
   - ring
-  - enemy
-  - Enemy
   - asteroid
+  - planet
+  - finishline
   layers:
   - Default
   - TransparentFX

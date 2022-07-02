@@ -83,4 +83,16 @@ public class AcceleratorCable : MonoBehaviour
         
 
     }
+
+    public void IncreaseSpeed(float increasePercentage)
+    {
+        baseSpeed = (baseSpeed * (1 + increasePercentage) > 0) ? baseSpeed * (1 + increasePercentage) : 0;
+    }
+
+    public void DecreaseSpeed(float decreasePercentage)
+    {
+        // OR: IncreaseSpeed((1/(decreasePercentage+1))-1);
+        baseSpeed = (baseSpeed / (1 + decreasePercentage) > 0) ? baseSpeed / (1 + decreasePercentage) : 0;
+    }
+
 }
