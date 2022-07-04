@@ -8,9 +8,9 @@ public class AcceleratorCable : MonoBehaviour
     float speed = 100.0f;
     int counter = 0;
     private CharacterController controller;
-    private float baseSpeed = 20.0f; //40
-    private float rotateSpeedX = 10.0f;
-    private float rotateSpeedY = 1.5f;
+    private float baseSpeed = 40.0f;
+    private float rotateSpeedX = 20.0f; // r - l
+    private float rotateSpeedY = 10.0f; // u - d
 
     // Start is called before the first frame update
     void Start()
