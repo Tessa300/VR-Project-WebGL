@@ -56,12 +56,16 @@ public class AcceleratorCable : MonoBehaviour
         controller.Move(moveVector * Time.deltaTime);
 
         // rotate the plane
-        float maxPlaneRotation = 20f;
-        float valPlaneRotation = GameObject.Find("Paperplane").transform.rotation.eulerAngles.z;
-        if(valPlaneRotation > 360 - maxPlaneRotation || valPlaneRotation < maxPlaneRotation // > 340 || < 20
-            || (valPlaneRotation < 360 - maxPlaneRotation && valPlaneRotation > 180 && inputX < 0) // < 340 & > 180 & -
-            || (valPlaneRotation > maxPlaneRotation && valPlaneRotation < 180 && inputX > 0)) // > 20 && < 180 & +
+        float maxPlaneRotation = 15f;
+        //float valPlaneRotation = GameObject.Find("Paperplane").transform.rotation.eulerAngles.z;
+        float valPlaneRotation = GameObject.Find("Main Camera").transform.rotation.eulerAngles.z;
+        if (valPlaneRotation > 360 - maxPlaneRotation || valPlaneRotation < maxPlaneRotation // > 340 || < 20
+            || (valPlaneRotation < 360 - maxPlaneRotation && valPlaneRotation > 180 && inputX > 0) // < 340 & > 180 & -
+            || (valPlaneRotation > maxPlaneRotation && valPlaneRotation < 180 && inputX < 0)) // > 20 && < 180 & +
+        {
+            GameObject.Find("Main Camera").transform.Rotate(0, 0, inputX);
             GameObject.Find("Paperplane").transform.Rotate(0, 0, inputX * -1);
+        }
 
 
         /*
