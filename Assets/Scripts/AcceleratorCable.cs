@@ -28,8 +28,9 @@ public class AcceleratorCable : MonoBehaviour
         Vector3 moveVector = transform.forward * baseSpeed;
 
         // Gather players Input
-        
+
         // Get the delta direction
+        float inputX = Input.acceleration.x;
         Vector3 yaw = Input.acceleration.x * transform.right * rotateSpeedX * Time.deltaTime;
         Vector3 pitch = Input.acceleration.z * transform.up * rotateSpeedY * Time.deltaTime;
         Vector3 dir = yaw + pitch;
@@ -53,34 +54,42 @@ public class AcceleratorCable : MonoBehaviour
 
         // move him
         controller.Move(moveVector * Time.deltaTime);
-     
-     /*
-        counter = counter +1;
-       Vector3 dir = Vector3.zero;
-        dir.x = Input.acceleration.y;
-        //dir.z = Input.acceleration.x;
-       // if (dir.sqrMagnitude > 1)
-       //     dir.Normalize();
 
-        dir *= Time.deltaTime;
+        // rotate the plane
+        float maxPlaneRotation = 20f;
+        float valPlaneRotation = GameObject.Find("Paperplane").transform.rotation.eulerAngles.z;
+        if(valPlaneRotation > 360 - maxPlaneRotation || valPlaneRotation < maxPlaneRotation // > 340 || < 20
+            || (valPlaneRotation < 360 - maxPlaneRotation && valPlaneRotation > 180 && inputX < 0) // < 340 & > 180 & -
+            || (valPlaneRotation > maxPlaneRotation && valPlaneRotation < 180 && inputX > 0)) // > 20 && < 180 & +
+            GameObject.Find("Paperplane").transform.Rotate(0, 0, inputX * -1);
 
-        // Move object
-        //Debug.Log(dir*speed);
-        float x = Input.acceleration.x;
-        //transform.Translate(x, (Input.acceleration.z), 0);
-        transform.Translate(x, 0 , 0);
-        transform.Translate(0, 0, 0.1f);
-        transform.Rotate(0,0,-x);
-        if(counter == 60){
-         //Debug.Log("X" + Input.acceleration.x);
-        Debug.Log(Input.acceleration.y);
-        counter = 0;
-        }
-        */
 
-   
+        /*
+           counter = counter +1;
+          Vector3 dir = Vector3.zero;
+           dir.x = Input.acceleration.y;
+           //dir.z = Input.acceleration.x;
+          // if (dir.sqrMagnitude > 1)
+          //     dir.Normalize();
 
-        
+           dir *= Time.deltaTime;
+
+           // Move object
+           //Debug.Log(dir*speed);
+           float x = Input.acceleration.x;
+           //transform.Translate(x, (Input.acceleration.z), 0);
+           transform.Translate(x, 0 , 0);
+           transform.Translate(0, 0, 0.1f);
+           transform.Rotate(0,0,-x);
+           if(counter == 60){
+            //Debug.Log("X" + Input.acceleration.x);
+           Debug.Log(Input.acceleration.y);
+           counter = 0;
+           }
+           */
+
+
+
 
     }
 
