@@ -144,7 +144,8 @@ public class PlayControl : MonoBehaviour
         PlayerPrefs.SetInt("gameScore", score);
         scoreText.text = "";
         endText.text = "";
-        AcceleratorCable ac = gameObject.GetComponent<AcceleratorCable>();
+        introVoiceSound.Play();
+        yield return new WaitForSeconds(introVoiceSound.clip.length);
         backgroundMusic.Play();
         endText.text = "3";
         yield return new WaitForSeconds(0.5f);
@@ -153,6 +154,7 @@ public class PlayControl : MonoBehaviour
         endText.text = "1";
         yield return new WaitForSeconds(0.5f);
         endText.text = "";
+        AcceleratorCable ac = gameObject.GetComponent<AcceleratorCable>();
         ac.moveAllowed = true;
         lastEnergyDecrease = Time.realtimeSinceStartup;
         running = true;
