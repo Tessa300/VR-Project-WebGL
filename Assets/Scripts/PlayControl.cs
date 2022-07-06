@@ -23,8 +23,8 @@ public class PlayControl : MonoBehaviour
     private float energy = 100f;
     private float secondsBetweenEnergyDecreases = 1f;
     private float decreaseEnergyPercentage = 0.03f;
-    private float increaseEnergyPercentage = 0.3f;
-    private float lowEnergyWarnStart = 50f;
+    private float increaseEnergyConst = 30f;
+    private float lowEnergyWarnStart = 40f;
     private float lastEnergyDecrease = 0;
     private float ringIncreaseSpeedPercentage = 0.5f;
 
@@ -103,10 +103,10 @@ public class PlayControl : MonoBehaviour
             // Stop game
             StartCoroutine(E_stopSequence(winnerSound, "Gewonnen"));
         }
-        if (collider.tag == "ring")
+        if (collider.tag == "ring" && collider.gameObject.GetComponent<Ring>().IsActive())
         {
             score++;
-            energy = (energy + energy * increaseEnergyPercentage < 100) ? energy + energy * decreaseEnergyPercentage : 100;
+            energy = (energy + increaseEnergyConst < 100) ? energy + increaseEnergyConst : 100;
             Destroy(collider.gameObject);
             StartCoroutine(E_playSoundShowText(ringCrossingSound, ringIncreaseSpeedPercentage));
         }
@@ -114,7 +114,7 @@ public class PlayControl : MonoBehaviour
         {
             score--;
             // Stop game
-            StartCoroutine(E_stopSequence(crashPlanetSound, "Von Planet gefressen"));
+            StartCoroutine(E_stopSequence(crashPlanetSound, "An Planet zerschellt"));
         }
         else if (collider.tag == "asteroid")
         {

@@ -7,7 +7,7 @@ public class PlaceMoreRandom : MonoBehaviour
     public GameObject prefab;
 
     public float amountNewObjects = 20;
-    private float positionRange = 2000;
+    private float positionRange = 7000;
     public float minDistanceToOthers = 100;
 
 

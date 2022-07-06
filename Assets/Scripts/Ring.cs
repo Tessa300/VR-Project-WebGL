@@ -28,6 +28,11 @@ public class Ring : MonoBehaviour
         }
     }
 
+    public bool IsActive()
+    {
+        return ringActive;
+    }
+
 
 
 }
