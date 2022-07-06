@@ -26,7 +26,7 @@ public class PlayControl : MonoBehaviour
     private float increaseEnergyPercentage = 0.3f;
     private float lowEnergyWarnStart = 50f;
     private float lastEnergyDecrease = 0;
-    private float ringIncreaseSpeedPercentage = 1f;
+    private float ringIncreaseSpeedPercentage = 0.5f;
 
     private bool musicFadeOutEnabled = false;
     private bool outOfControl = false;
@@ -55,7 +55,7 @@ public class PlayControl : MonoBehaviour
             if (energy <= 0)
             {
                 energy = 0;
-                GetComponent<Renderer>().material.color = Color.red;
+                GameObject.Find("Paperplane").GetComponent<Renderer>().material.color = Color.red;
                 outOfControl = true;
                 // Stop game
                 StartCoroutine(E_stopSequence(energyEmptySound, "Keine Energie mehr"));
@@ -69,13 +69,13 @@ public class PlayControl : MonoBehaviour
             {
                 // Energy up after low
                 energyLowSound.Stop();
-                GetComponent<Renderer>().material.color = Color.white;
+                GameObject.Find("Paperplane").GetComponent<Renderer>().material.color = Color.white;
             }
 
             if (energy <= lowEnergyWarnStart && energy > 0)
             {
                 // Energy low running -> Blink
-                GetComponent<Renderer>().material.color = Color.Lerp(Color.white, Color.red, Mathf.PingPong(Time.time, 1));
+                GameObject.Find("Paperplane").GetComponent<Renderer>().material.color = Color.Lerp(Color.white, Color.red, Mathf.PingPong(Time.time, 1));
             }
         }
 
@@ -145,8 +145,6 @@ public class PlayControl : MonoBehaviour
         scoreText.text = "";
         endText.text = "";
         AcceleratorCable ac = gameObject.GetComponent<AcceleratorCable>();
-        introVoiceSound.Play();
-        yield return new WaitForSeconds(introVoiceSound.clip.length);
         backgroundMusic.Play();
         endText.text = "3";
         yield return new WaitForSeconds(0.5f);
