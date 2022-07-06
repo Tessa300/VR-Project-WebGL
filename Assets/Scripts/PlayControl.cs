@@ -90,9 +90,9 @@ public class PlayControl : MonoBehaviour
                 backgroundMusic.volume = newVolume;
         }
 
-        // Player is out of control -> turns
-        if (outOfControl)
-            transform.Rotate(UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360));
+        // Player is out of control -> turns -> NO Cybersickness
+        //if (outOfControl)
+        //    transform.Rotate(UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360));
     }
 
     private void OnTriggerEnter(Collider collider)
