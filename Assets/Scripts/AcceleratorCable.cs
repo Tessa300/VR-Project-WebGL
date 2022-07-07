@@ -5,12 +5,18 @@ using UnityEngine;
 public class AcceleratorCable : MonoBehaviour
 {
     public bool moveAllowed = false;
-    float speed = 100.0f;
-    int counter = 0;
     private CharacterController controller;
-    private float baseSpeed = 40.0f;
-    private float rotateSpeedX = 20.0f; // r - l
-    private float rotateSpeedY = 10.0f; // u - d
+    private float speed  = 40.0f;
+    private float rotateSpeedX = 20.0f; // right - left
+    private float rotateSpeedY = 10.0f; // up - down
+    private float maxPlaneRotation = 15f;
+    private float inputX;
+    private float inputZ;
+    private Vector3 moveVector;
+    private Vector3 yaw;
+    private Vector3 pitch;
+    private  Vector3 direction;
+
 
     // Start is called before the first frame update
     void Start()
@@ -25,38 +31,37 @@ public class AcceleratorCable : MonoBehaviour
             return;
 
         // Give the player forward velocity
-        Vector3 moveVector = transform.forward * baseSpeed;
+        moveVector = transform.forward * speed;
 
         // Gather players Input
 
         // Get the delta direction
-        float inputX = Input.acceleration.x;
-        Vector3 yaw = Input.acceleration.x * transform.right * rotateSpeedX * Time.deltaTime;
-        Vector3 pitch = Input.acceleration.z * transform.up * rotateSpeedY * Time.deltaTime;
-        Vector3 dir = yaw + pitch;
+        setInputX();
+        setInputZ();
+        setYaw();
+        setPitch();
+        setDirection();   
+    
+        if (direction.sqrMagnitude > 1)
+            direction.Normalize();
 
-        // Make sure we limit the player from doing a loop
-        float maxX = Quaternion.LookRotation(moveVector + dir).eulerAngles.x;
 
-        //if he does not going to far up/down, add the direction to the moveVector
-        if(maxX < 90 && maxX > 70 || maxX > 270 && maxX < 290)
-        {
-            // too far
-        }
-        else
-        {
-            // add the direction to current move
-            moveVector += dir;
-
-            // have the player face where is is going
+        if(checkUpDownLimitation()){
+            addDirection(direction);
             transform.rotation = Quaternion.LookRotation(moveVector);
         }
+       
 
-        // move him
+        // move character
         controller.Move(moveVector * Time.deltaTime);
 
         // rotate the plane
-        float maxPlaneRotation = 15f;
+        rotateCharacter();
+
+    }
+
+    public void rotateCharacter()
+    {
         //float valPlaneRotation = GameObject.Find("Paperplane").transform.rotation.eulerAngles.z;
         float valPlaneRotation = GameObject.Find("Main Camera").transform.rotation.eulerAngles.z;
         if (valPlaneRotation > 360 - maxPlaneRotation || valPlaneRotation < maxPlaneRotation // > 340 || < 20
@@ -66,46 +71,59 @@ public class AcceleratorCable : MonoBehaviour
             GameObject.Find("Main Camera").transform.Rotate(0, 0, inputX);
             GameObject.Find("Paperplane").transform.Rotate(0, 0, inputX * -1);
         }
+    }
 
+    public void setPitch()
+    {
+        pitch = inputZ * transform.up * rotateSpeedY * Time.deltaTime;
+    }
 
-        /*
-           counter = counter +1;
-          Vector3 dir = Vector3.zero;
-           dir.x = Input.acceleration.y;
-           //dir.z = Input.acceleration.x;
-          // if (dir.sqrMagnitude > 1)
-          //     dir.Normalize();
+    public void setYaw()
+    {
+        yaw = inputX * transform.right * rotateSpeedX * Time.deltaTime;
+    }
 
-           dir *= Time.deltaTime;
+    public void setDirection()
+    {
+        direction = yaw + pitch;
+    }
 
-           // Move object
-           //Debug.Log(dir*speed);
-           float x = Input.acceleration.x;
-           //transform.Translate(x, (Input.acceleration.z), 0);
-           transform.Translate(x, 0 , 0);
-           transform.Translate(0, 0, 0.1f);
-           transform.Rotate(0,0,-x);
-           if(counter == 60){
-            //Debug.Log("X" + Input.acceleration.x);
-           Debug.Log(Input.acceleration.y);
-           counter = 0;
-           }
-           */
+    public void setInputX()
+    {
+        inputX =  Input.acceleration.x;
+    }
 
+    public void setInputZ()
+    {
+        inputZ = Input.acceleration.z;
+    }
+    public void addDirection(Vector3 direction)
+    {
+        moveVector += direction;
+    }
 
-
-
+    public bool checkUpDownLimitation()
+    {
+        float maxXvalue = Quaternion.LookRotation(moveVector + direction).eulerAngles.x;
+        if(maxXvalue < 90 && maxXvalue > 70 || maxXvalue > 270 && maxXvalue < 290)
+        {
+            return false;
+        }
+        else
+        {
+            return true;
+        }
     }
 
     public void IncreaseSpeed(float increasePercentage)
     {
-        baseSpeed = (baseSpeed * (1 + increasePercentage) > 0) ? baseSpeed * (1 + increasePercentage) : 0;
+        speed = (speed * (1 + increasePercentage) > 0) ? speed * (1 + increasePercentage) : 0;
     }
 
     public void DecreaseSpeed(float decreasePercentage)
     {
         // OR: IncreaseSpeed((1/(decreasePercentage+1))-1);
-        baseSpeed = (baseSpeed / (1 + decreasePercentage) > 0) ? baseSpeed / (1 + decreasePercentage) : 0;
+        speed = (speed / (1 + decreasePercentage) > 0) ? speed / (1 + decreasePercentage) : 0;
     }
 
 }
