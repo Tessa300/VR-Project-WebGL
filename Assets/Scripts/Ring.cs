@@ -5,12 +5,12 @@ using UnityEngine;
 public class Ring : MonoBehaviour
 {
 
-    private Objective objectiveScript;
+    private RingController ringController;
     private bool ringActive = false;
 
     private void Start()
     {
-        objectiveScript = FindObjectOfType<Objective>();
+        ringController = FindObjectOfType<RingController>();
     }
 
     public void ActivateRing()
@@ -23,8 +23,7 @@ public class Ring : MonoBehaviour
         
         if(ringActive)
         {
-            Debug.Log("Test");
-            objectiveScript.NextRing();
+            ringController.NextRing();
         }
     }
 
