@@ -6,11 +6,17 @@ using TMPro;
 using UnityEngine.SceneManagement;
 using System;
 
+/// <summary>
+/// Controles the energy level, score, colliders, audio, visuals
+/// </summary>
 public class PlayControl : MonoBehaviour
 {
+    // Score and energy level
     public TextMeshProUGUI scoreText;
+    // Game over text
     public TextMeshProUGUI endText;
 
+    // Audio sources
     public AudioSource backgroundMusic;
     public AudioSource introVoiceSound;
     public AudioSource ringCrossingSound;
@@ -20,26 +26,33 @@ public class PlayControl : MonoBehaviour
     public AudioSource energyEmptySound;
     public AudioSource winnerSound;
 
-    private float energy = 100f;
+    // Some parameters for overview and easy access
     private float secondsBetweenEnergyDecreases = 1f;
     private float decreaseEnergyPercentage = 0.03f;
     private float increaseEnergyConst = 30f;
-    private float lowEnergyWarnStart = 40f;
-    private float lastEnergyDecrease = 0;
+    private float lowEnergyWarnStart = 40f; // max 100%
     private float ringIncreaseSpeedPercentage = 0.5f;
 
+    // used for fade out background music after game end
     private bool musicFadeOutEnabled = false;
+    // user has no control over the plane <- no energy
     private bool outOfControl = false;
+    // game is running
     private bool running = false;
-    private int score = 0;
 
-    // Start is called before the first frame update
+    // Players score +  energy level
+    private int score = 0;
+    private float energy = 100f;
+    // Last energy decrease in sec from Time.realtimeSinceStartup
+    private float lastEnergyDecrease = 0;
+
+
     void Start()
     {
         StartCoroutine(E_startSequence());
     }
 
-    // Update is called once per frame
+    
     void Update()
     {
         if (running)
@@ -47,13 +60,13 @@ public class PlayControl : MonoBehaviour
             // Decrease energy
             if (Time.realtimeSinceStartup - lastEnergyDecrease >= secondsBetweenEnergyDecreases)
             {
-                energy -= (energy * decreaseEnergyPercentage > 2) ? energy * decreaseEnergyPercentage : 2; // minimus decrease value is 2%
+                energy -= (energy * decreaseEnergyPercentage > 2) ? energy * decreaseEnergyPercentage : 2; // minimum decrease value is 2%
                 lastEnergyDecrease = Time.realtimeSinceStartup;
             }
 
-            // End game if energy is empty
             if (energy <= 0)
             {
+                // End game if energy is empty
                 energy = 0;
                 GameObject.Find("Paperplane").GetComponent<Renderer>().material.color = Color.red;
                 outOfControl = true;
@@ -62,8 +75,8 @@ public class PlayControl : MonoBehaviour
             }
             else if (energy <= lowEnergyWarnStart && !energyLowSound.isPlaying)
             {
-                // Energy low start
-                energyLowSound.Play();
+                // Energy low start (in AudioSource set on loop)
+                energyLowSound.Play(); 
             }
             else if (energy > lowEnergyWarnStart && energyLowSound.isPlaying)
             {
@@ -80,31 +93,35 @@ public class PlayControl : MonoBehaviour
         }
 
 
-        // Fade out background music if requestet
+        // Fade out background music (make quieter step by step) if requestet 
         if (musicFadeOutEnabled)
         {
-            float newVolume = backgroundMusic.volume - (0.2f * Time.deltaTime);  //change 0.01f to something else to adjust the rate of the volume dropping
+            float newVolume = backgroundMusic.volume - (0.2f * Time.deltaTime);
             if (newVolume < 0.1f)
                 backgroundMusic.Stop();
             else
                 backgroundMusic.volume = newVolume;
         }
 
-        // Player is out of control -> turns -> NO Cybersickness
+        // Player is out of control -> turns -> Not used because of Cybersickness
         //if (outOfControl)
         //    transform.Rotate(UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360), UnityEngine.Random.Range(0, 360));
     }
 
+
+    // Player collided with an object
     private void OnTriggerEnter(Collider collider)
     {
-        if(collider.tag == "finishline")
+        if(collider.tag == "finishline" && collider.gameObject.GetComponent<Ring>().IsActive())
         {
+            // Collided with final ring
             score++;
             // Stop game
             StartCoroutine(E_stopSequence(winnerSound, "Gewonnen"));
         }
-        if (collider.tag == "ring" && collider.gameObject.GetComponent<Ring>().IsActive())
+        else if (collider.tag == "ring" && collider.gameObject.GetComponent<Ring>().IsActive())
         {
+            // Collided with now active ring
             score++;
             energy = (energy + increaseEnergyConst < 100) ? energy + increaseEnergyConst : 100;
             Destroy(collider.gameObject);
@@ -112,12 +129,14 @@ public class PlayControl : MonoBehaviour
         }
         else if (collider.tag == "planet")
         {
+            // Collided with a planet
             score--;
             // Stop game
             StartCoroutine(E_stopSequence(crashPlanetSound, "An Planet zerschellt"));
         }
         else if (collider.tag == "asteroid")
         {
+            // Collided with an asteroid
             score--;
             Destroy(collider.gameObject);
             StartCoroutine(E_playSoundShowText(crashAsteriodSound, 0));
@@ -125,6 +144,16 @@ public class PlayControl : MonoBehaviour
         Debug.Log(collider.tag);
     }
 
+
+    //// IEnumerator definitions used for Coroutine to start one action after another finished
+    //// For better overview also not order sensitive instructions were placed here
+
+    /// <summary>
+    /// Play sound and show score text while sound is playing
+    /// </summary>
+    /// <param name="playSource">AudioSource to play</param>
+    /// <param name="increaseSpeedPercentage">Percentage value for temporary speed increase</param>
+    /// <returns></returns>
     IEnumerator E_playSoundShowText(AudioSource playSource, float increaseSpeedPercentage)
     {
         AcceleratorCable ac = gameObject.GetComponent<AcceleratorCable>();
@@ -138,6 +167,10 @@ public class PlayControl : MonoBehaviour
         scoreText.text = "";
     }
 
+    /// <summary>
+    /// Start sqeuence with intro voice, 321-counter, starts movement and init params adjustments
+    /// </summary>
+    /// <returns></returns>
     IEnumerator E_startSequence()
     {
         score = 0;
@@ -160,6 +193,14 @@ public class PlayControl : MonoBehaviour
         running = true;
     }
 
+    /// <summary>
+    /// Sequence at the end of the game to stop
+    /// Plays end of the game sound, starts the fading out of the background music, 
+    /// shows message, stops movement, returns to menu scene
+    /// </summary>
+    /// <param name="playSource">End of the game sound</param>
+    /// <param name="stopMessage"></param>
+    /// <returns></returns>
     IEnumerator E_stopSequence(AudioSource playSource, string stopMessage)
     {
         running = false;

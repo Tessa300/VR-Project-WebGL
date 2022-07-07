@@ -7,6 +7,7 @@ using TMPro;
 
 public class MenuStartBtn : MonoBehaviour
 {
+    // Game scene that starts if Start-Button is slided to right bound
     public string gameSceneName;
 
     public TextMeshPro textGameScore;
@@ -14,8 +15,6 @@ public class MenuStartBtn : MonoBehaviour
     public TextMeshPro textHighscore2;
     public TextMeshPro textHighscore3;
 
-
-    // Start is called before the first frame update
     void Start()
     {
         // Set init highscores
@@ -56,6 +55,7 @@ public class MenuStartBtn : MonoBehaviour
                 textGameScore.text = "Neuer dritter Platz: ";
             }
 
+            // Save new highscores
             PlayerPrefs.SetInt("highscore_1", highscore1);
             PlayerPrefs.SetInt("highscore_2", highscore2);
             PlayerPrefs.SetInt("highscore_3", highscore3);
@@ -75,13 +75,10 @@ public class MenuStartBtn : MonoBehaviour
     }
 
    
-
-    // Update is called once per frame
     void Update()
     {
-        float x = Input.acceleration.x;
-        float speed = 20f;
-        transform.Translate(x * speed, 0, 0);
+        // Move slide Start-'button'
+        transform.Translate(Input.acceleration.x * 20f, 0, 0);
 
         // set left bound
         if (transform.position.x < -200)
@@ -89,8 +86,7 @@ public class MenuStartBtn : MonoBehaviour
             Vector3 pos = transform.position;
             pos.x = -200;
             transform.position = pos;
-        }
-            
+        }            
 
         // right bound reached -> start
         if (transform.position.x >= 207)
